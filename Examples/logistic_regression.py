@@ -5,7 +5,7 @@ import math
 import matplotlib.pyplot as plt
 import copy
 
-class LinearRegression():
+class LogisticRegression():
 
     def __init__(self, lr, max_iterations = 1000, sc = 0.001):
         self.lr = lr
