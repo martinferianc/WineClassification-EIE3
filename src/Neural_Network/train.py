@@ -9,9 +9,10 @@ import tensorflow as tf
 # Initialize the basic parameters of the network
 BASE_NAME = "attempt0"
 LEARNING_RATE = 0.001
-HIDDEN_LAYERS = 1
-HIDDEN_NEURONS = 1
+HIDDEN_LAYERS = 3
+HIDDEN_NEURONS = 1000
 REGULARIZER = "L2"
+REGULARIZATION_PENALTY = 0.001
 ACTIVATION = "relu"
 EPOCHS = 5
 BATCH_SIZE = 64
@@ -45,12 +46,13 @@ def n_fold(n_folds = 10, save = True):
     print("## Epochs:{} ##".format(EPOCHS))
     print("## Batch Size:{} ##".format(BATCH_SIZE))
     print("## Regularizer:{} ##".format(REGULARIZER))
+    print("## Regularizer penalty:{} ##".format(REGULARIZATION_PENALTY))
     print("## Activation:{} ##".format(ACTIVATION))
 
     if not os.path.isdir("models/"+BASE_NAME):
         os.makedirs("models/"+BASE_NAME)
 
-    for i in range(1,n_folds):
+    for i in range(0,n_folds):
         print("## Fold:{} ##".format(i))
         # Begin each training completely separetely
 
@@ -62,12 +64,11 @@ def n_fold(n_folds = 10, save = True):
             # Separete the labels from the features and do one hot encoding for the neural network
             X_train, Y_train = separete_data(train_data)
             X_val, Y_val = separete_data(validation_data)
-            X_test, Y_test = separete_data(test_data)
 
             # Initialize a new network per each new fold, all the networks are going to be the same
             NET_NAME = BASE_NAME + "_"+  str(i)
             net = Network(name = NET_NAME, base_name = BASE_NAME)
-            net.init_self_net(HIDDEN_LAYERS, HIDDEN_NEURONS,dropout = DROPOUT, beta1=BETA1 lr=LEARNING_RATE, activation = ACTIVATION, regularizer = REGULARIZER)
+            net.init_self_net(HIDDEN_LAYERS, HIDDEN_NEURONS,drop = DROPOUT, beta1=BETA1, lr=LEARNING_RATE, activation = ACTIVATION, regularizer = REGULARIZER, regularization_penalty=REGULARIZATION_PENALTY)
 
             # Train the network and optimize it with using the validation set
             # Or train the final network and compute the actual test error
@@ -92,6 +93,7 @@ def final_model(save = True):
     print("## Epochs:{} ##".format(EPOCHS))
     print("## Batch Size:{} ##".format(BATCH_SIZE))
     print("## Regularizer:{} ##".format(REGULARIZER))
+    print("## Regularizer penalty:{} ##".format(REGULARIZER_PENALTY))
     print("## Activation:{} ##".format(ACTIVATION))
 
     if not os.path.isdir("models/"+BASE_NAME):
@@ -115,7 +117,7 @@ def final_model(save = True):
         # Initialize a new network per each new fold, all the networks are going to be the same
         NET_NAME = BASE_NAME + "_"+  str(i)
         net = Network(name = NET_NAME, base_name = BASE_NAME)
-        net.init_self_net(HIDDEN_LAYERS, HIDDEN_NEURONS, lr=LEARNING_RATE, activation = ACTIVATION, regularizer = REGULARIZER)
+        net.init_self_net(HIDDEN_LAYERS, HIDDEN_NEURONS,dropout = DROPOUT, beta1=BETA1, lr=LEARNING_RATE, activation = ACTIVATION, regularizer = REGULARIZER, regularizer_penalty=REGULARIZATION_PENALTY)
 
         # Train the network for the final time
         net.train(X_train,Y_train,X_test,Y_test, epochs=EPOCHS, batch_size = BATCH_SIZE, save=save, file_path="models")

@@ -1,9 +1,7 @@
 from tflearn.layers.core import input_data, dropout, fully_connected
 from tflearn.layers.estimator import regression
 from tflearn.optimizers import Adam
-from tflearn.layers.estimator import regression
 from tflearn import DNN
-import tensorflow as tf
 import os
 
 import numpy as np
@@ -12,17 +10,18 @@ class Network:
     """
     This is a wrapper class for the network structure
     """
-
     def __init__(self, name, base_name):
         self.base_name = base_name
         self.name = name
+        self.model = None
+        self.net = None
 
     #Initializes the self.net
-    def init_self_net(self ,hidden_layers, hidden_neurons,dropout=0.8,beta1=0.99,lr=0.001, activation="relu", n_features=11, n_classes=11, regularizer=""):
+    def init_self_net(self ,hidden_layers, hidden_neurons,drop=0.8,beta1=0.99,lr=0.001, activation="relu", n_features=11, n_classes=11, regularizer="", regularization_penalty=0.001):
         self.net = input_data(shape=[None, n_features], name='input')
         for i in range(hidden_layers):
-            self.net = fully_connected(self.net, hidden_neurons, activation=activation, regularizer=regularizer)
-            self.net = dropout(self.net, dropout)
+            self.net = fully_connected(self.net, hidden_neurons, activation=activation, regularizer=regularizer, weight_decay=regularization_penalty)
+            self.net = dropout(self.net, drop)
         self.net = fully_connected(self.net, n_classes, activation='softmax')
 
         # Define the optimizer
@@ -42,9 +41,21 @@ class Network:
             self.save_net("{}/{}/{}/{}".format(file_path, self.base_name, self.name, self.name))
 
     def evaluate_model(self, X,Y):
-        if self.net is None:
+        if X.size == 0 or Y.size == 0:
+            raise EmptyDataError("No data to train on!")
+        if self.net is None or self.model is None:
             raise EmptyNetError("No self.net to be trained!")
         return self.model.evaluate(X,Y, batch_size=X.shape[0])
+
+    def predict(self,X):
+        if X.size == 0:
+            raise EmptyDataError("No data to train on!")
+        if self.net is None or self.model is None:
+            raise EmptyNetError("No self.net to be trained!")
+        labels = []
+        for feature_set in X:
+            labels.append(np.argmax(self.model.predict([feature_set])))
+        return np.array(labels)
 
     def load_net(self, file_path):
         if self.net is None:
@@ -53,6 +64,6 @@ class Network:
         self.model.load(file_path)
 
     def save_net(self, file_path):
-        if self.net is None:
+        if self.net is None or self.model is None:
             raise EmptyNetError("No self.net to be saved!")
         self.model.save(file_path)

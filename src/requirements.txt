@@ -2,3 +2,4 @@ tqdm
 numpy
 tensorflow
 tflearn
+scikit-learn

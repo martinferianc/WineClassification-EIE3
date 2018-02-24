@@ -1,62 +1,62 @@
-from binary import BinaryLinearRegression
-from exceptions import NoModeError
+from sklearn import linear_model
 import pickle
 import os
+
 import numpy as np
-import copy
-import random
 
-
-class LinearRegression:
+class LinearRegressionClassifier:
     """
-    A wrapper class to store the linear regressors
+    This is a wrapper for linear regression for classification
     """
 
-    def __init__(self):
-        self.regressors = []
-        pass
+    def __init__(self, name, base_name):
+        self.base_name = base_name
+        self.name = name
+        self.clf = None
 
-    # Get scores from all the emotion trees
-    def __test(self, feature_set, n_classes = 11):
-        test_results = []
-        for i in range(len(self.trees)):
-            # Appends the label of the regressor
-            test_results.append((self.regressors[i].test(feature_set), i + 1))
+    # Trains the classifier
+    def train(self,X_train,Y_train,loss="squared_loss",epochs=20,regularizer="l2",regularizer_penalty=0.0001, stop=0.001, save=False, file_path="models"):
+        if X_train.size == 0 or Y_train.size == 0:
+            raise EmptyDataError("No data to train on!")
 
-        test_results_ones = []
-        # Filters out -1 labels
-        for result in test_results:
-            # Label
-            if result[0] == 1:
-                test_results_ones.append(result)
+        self.clf = linear_model.SGDClassifier(alpha=regularizer_penalty, average=False, class_weight=None, epsilon=0.1,
+                                              learning_rate='optimal', loss=loss, max_iter=epochs,
+                                              penalty=regularizer, tol=stop, verbose=5, warm_start=False)
+        self.clf.fit(X_train,Y_train)
+        if save:
+            if not os.path.isdir(file_path+"/"+self.base_name+"/"+self.name):
+                os.makedirs(file_path+"/"+self.base_name+"/"+self.name)
+            self.save("{}/{}/{}/{}".format(file_path, self.base_name, self.name, self.name))
 
-        # If no regressor could classify the data pick a label at random
-        if len(test_results_ones) == 0:
-            return np.random.randint(0, n_classes)
+    def evaluate_model(self, X,Y):
+        if X.size == 0 or Y.size == 0:
+            raise EmptyDataError("No data to train on!")
+        if self.clf is None:
+            raise EmptyClfError("No self.clf trained or loaded!")
+        error = 0
+        for i in range(X.shape[0]):
+            label = self.clf.predict(X[i].reshape(1,-1))
+            if label!=Y[i]:
+                error+=1
 
-        # If 2 or more regressos classified the data, pick one at random
-        elif len(test_results_ones)>2:
-            choice = random.choice(test_results_ones)
-            # Return the label
-            return choice[1]
-        else:
-            return test_results_ones[0][1]
+        return (1-error/X.shape[0])
 
-    # Tests all the data in bulk
-    def test(self, data):
+    def predict(self,X):
+        if X.size == 0:
+            raise EmptyDataError("No data to train on!")
+        if self.clf is None:
+            raise EmptyClfError("No self.clf trained or loaded!")
         labels = []
-        for row in data:
-            labels.append(self.__test(row))
+        for feature_set in X:
+            labels.append(self.clf.predict(feature_set.reshape(1,-1)))
         return np.array(labels)
 
-    # Save the classifier
     def save(self, file_path):
         with open(file_path, 'wb') as handle:
-            pickle.dump(self.regressors, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        return True
+            pickle.dump(self.clf, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            return True
 
-    # Loads the classifier
     def load(self, file_path):
         with open(file_path, 'rb') as handle:
-            self.regressors = pickle.load(handle)
+            self.clf = pickle.load(handle)
         return True
