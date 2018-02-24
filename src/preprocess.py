@@ -68,17 +68,14 @@ def n_fold(data, target_dir, n=10, validation=0.1, test=0.1):
 
 def build_data_sets(types = ["red", "white"]):
     print("### Beginning preprocessing ###")
+    file_path_red = (BASE_DIR + "raw/winequality-red.csv")
+    file_path_white = (BASE_DIR + "raw/winequality-white.csv")
 
-    for t in types:
-        print("## Beginning preproecessing {} data ##".format(t))
-        if not os.path.exists(os.path.join(BASE_DIR, "processed", t)):
-            os.makedirs(os.path.join(BASE_DIR, "processed", t))
-        file_path = (BASE_DIR + "raw/winequality-{}.csv").format(t)
-
-        print("Loading from file_path {}".format(file_path))
-        data = load_data(file_path)
-        n_fold(copy.deepcopy(data), (BASE_DIR + "processed/{0}/").format(t))
-        print("## Finished preproecessing {} data ##".format(t))
+    print("Loading files")
+    data_red = load_data(file_path_red)
+    data_white = load_data(file_path_white)
+    data = np.concatenate((data_red,data_white), axis = 0)
+    n_fold(copy.deepcopy(data), BASE_DIR + "processed/")
     print("### Finished preprocessing ###")
 
 if __name__ == "__main__":
