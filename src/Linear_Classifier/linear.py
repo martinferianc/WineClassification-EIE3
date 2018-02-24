@@ -1,7 +1,9 @@
 from sklearn import linear_model
 import pickle
 import os
-
+import sys
+import matplotlib.pyplot as plt
+import io
 import numpy as np
 
 class LinearRegressionClassifier:
@@ -19,10 +21,33 @@ class LinearRegressionClassifier:
         if X_train.size == 0 or Y_train.size == 0:
             raise EmptyDataError("No data to train on!")
 
+        old_stdout = sys.stdout
+        sys.stdout = mystdout = io.StringIO()
         self.clf = linear_model.SGDClassifier(alpha=regularizer_penalty, average=False, class_weight=None, epsilon=0.1,
-                                              learning_rate='optimal', loss=loss, max_iter=epochs,
-                                              penalty=regularizer, tol=stop, verbose=5, warm_start=False)
+                                              learning_rate='optimal', loss=loss, max_iter=epochs, fit_intercept=True,
+                                              penalty=regularizer, tol=stop, verbose=1, warm_start=True)
+
         self.clf.fit(X_train,Y_train)
+        sys.stdout = old_stdout
+        loss_history = mystdout.getvalue()
+        self.loss_list = []
+
+        for line in loss_history.split('\n'):
+            if(len(line.split("loss: ")) == 1):
+                continue
+            self.loss_list.append(float(line.split("loss: ")[-1]))
+
+        new_loss = []
+        prev = float("inf")
+        for val in self.loss_list:
+            if prev>val:
+                new_loss.append(val)
+                prev = val
+            else:
+                break
+        self.loss_list = new_loss
+
+
         if save:
             if not os.path.isdir(file_path+"/"+self.base_name+"/"+self.name):
                 os.makedirs(file_path+"/"+self.base_name+"/"+self.name)
@@ -40,6 +65,18 @@ class LinearRegressionClassifier:
                 error+=1
 
         return (1-error/X.shape[0])
+
+    def visualize_loss(self, file_path=None):
+        plt.figure()
+        plt.semilogy(np.arange(len(self.loss_list)), self.loss_list)
+        if not os.path.isdir("{}/{}/{}".format("logs", self.base_name, self.name)):
+            os.makedirs("{}/{}/{}/".format("logs", self.base_name, self.name))
+        plt.title("Plot of loss function for {}".format(self.name))
+        plt.xlabel("Epochs")
+        plt.ylabel("Loss")
+        plt.savefig("{}/{}/{}/{}.png".format("logs", self.base_name, self.name, self.name))
+        plt.close()
+
 
     def predict(self,X):
         if X.size == 0:

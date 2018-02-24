@@ -3,6 +3,7 @@ import sys
 import copy
 import numpy as np
 
+
 from linear import LinearRegressionClassifier
 
 # Initialize the basic parameters of the network
@@ -53,6 +54,7 @@ def n_fold(n_folds = 10, save = True):
 
         # Train the classifier
         clf.train(X_train,Y_train, epochs=EPOCHS, loss = LOSS, regularizer = REGULARIZER, regularizer_penalty = REGULARIZATION_PENALTY, stop = STOP, save=save, file_path="models")
+        clf.visualize_loss()
 
         # Get the validation accracy for one fold
         accuracy = clf.evaluate_model(X_val,Y_val)
