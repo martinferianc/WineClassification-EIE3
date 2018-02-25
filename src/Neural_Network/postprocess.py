@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, precision_score, recall_score
 
 # This function calculates the recall, precision scores and saves it into a file
-def calculate_scores(y_test, y_pred, name, fold = None):
-    with open("{}/{}/{}_{}/scores_{}.txt".format("logs",name, name,fold, name), "w") as text_file:
+def calculate_scores(y_test, y_pred, name,model, fold = None,):
+    with open("{}/{}/{}/{}_{}/scores_{}.txt".format(model,"logs",name, name,fold, name), "w") as text_file:
         classes_pred = [str(i) for i in np.unique(y_pred)]
         classes_test = [str(i) for i in np.unique(y_test)]
 
@@ -23,7 +23,7 @@ def calculate_scores(y_test, y_pred, name, fold = None):
         text_file.write("Recall scores:\n{}".format(r_score))
 
 # This function calculates the confusion matrix
-def plot_confusion_matrix(y_test, y_pred, name,
+def plot_confusion_matrix(y_test, y_pred, name, model,
                           normalize=False,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues,
@@ -69,7 +69,7 @@ def plot_confusion_matrix(y_test, y_pred, name,
     plt.xlabel('Predicted label')
 
     if normalize:
-        plt.savefig("{}/{}/{}_{}/cm_n_{}.png".format("logs",name, name,fold, name))
+        plt.savefig("{}/{}/{}/{}_{}/cm_n_{}.png".format(model,"logs",name, name,fold, name))
     else:
-        plt.savefig("{}/{}/{}_{}/cm_{}.png".format("logs",name, name,fold, name))
+        plt.savefig("{}/{}/{}/{}_{}/cm_{}.png".format(model,"logs",name, name,fold, name))
     plt.close()

@@ -10,7 +10,7 @@ def visualize(accuracies_train, accuracies_val, losses, name):
     plt.legend()
     plt.ylabel("Accuracy")
     plt.grid(True)
-    plt.savefig("{}/{}/t_error_{}.png".format("logs", name, name))
+    plt.savefig("Linear_Classifier/{}/{}/t_error_{}.png".format("logs", name, name))
     plt.close()
 
     plt.figure()
@@ -21,7 +21,7 @@ def visualize(accuracies_train, accuracies_val, losses, name):
     plt.legend()
     plt.ylabel("Accuracy")
     plt.grid(True)
-    plt.savefig("{}/{}/v_error_{}.png".format("logs", name, name))
+    plt.savefig("Linear_Classifier/{}/{}/v_error_{}.png".format("logs", name, name))
     plt.close()
 
     plt.figure()
@@ -32,5 +32,5 @@ def visualize(accuracies_train, accuracies_val, losses, name):
     plt.legend()
     plt.ylabel("Loss")
     plt.grid(True)
-    plt.savefig("{}/{}/loss_{}.png".format("logs", name, name))
+    plt.savefig("Linear_Classifier/{}/{}/loss_{}.png".format("logs", name, name))
     plt.close()

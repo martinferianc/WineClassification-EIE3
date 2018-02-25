@@ -3,23 +3,9 @@ import sys
 import copy
 import numpy as np
 
-from network import Network
+from .network import Network
 import tensorflow as tf
-from postprocess import plot_confusion_matrix, calculate_scores
-
-# Initialize the basic parameters of the network
-LEARNING_RATE = 0.001
-HIDDEN_LAYERS = 3
-HIDDEN_NEURONS = 1
-REGULARIZER = "L2"
-REGULARIZATION_PENALTY = 0.001
-ACTIVATION = "relu"
-EPOCHS = 1
-N_BATCHES = 10
-DROPOUT = 0.8
-BETA1= 0.99
-TEST = False
-BASE_NAME = str(HIDDEN_LAYERS) + "_" + str(HIDDEN_NEURONS) + "_" + str(DROPOUT) + "_" + str(REGULARIZER) + "_" + str(REGULARIZATION_PENALTY) + "_" + str(ACTIVATION)
+from .postprocess import plot_confusion_matrix, calculate_scores
 
 # Convert labels into one-hot encoding
 def one_hot(labels):
@@ -37,8 +23,20 @@ def separete_data(data):
     return (features, one_hot_labels, original_labels)
 
 # This function performs training for the specific network and performs n_fold cross validation
-def n_fold(n_folds = 10, save = True, test = False):
+def n_fold(model, n_folds = 10, save = True, test = False):
     accuracies = []
+
+    LEARNING_RATE = model["LEARNING_RATE"]
+    HIDDEN_LAYERS =model["HIDDEN_LAYERS"]
+    HIDDEN_NEURONS = model["HIDDEN_NEURONS"]
+    REGULARIZER = model["REGULARIZER"]
+    REGULARIZATION_PENALTY = model["REGULARIZATION_PENALTY"]
+    ACTIVATION = model["ACTIVATION"]
+    EPOCHS = model["EPOCHS"]
+    N_BATCHES = model["N_BATCHES"]
+    DROPOUT = model["DROPOUT"]
+    BETA1 = model["BETA1"]
+    BASE_NAME = str(HIDDEN_LAYERS) + "_" + str(HIDDEN_NEURONS) + "_" + str(DROPOUT) + "_" + str(REGULARIZER) + "_" + str(REGULARIZATION_PENALTY) + "_" + str(ACTIVATION)
 
     print("### Beginning n-fold cross validation with parameters: ###")
     print("## Netwok name: ##".format(BASE_NAME))
@@ -51,8 +49,8 @@ def n_fold(n_folds = 10, save = True, test = False):
     print("## Regularizer penalty:{} ##".format(REGULARIZATION_PENALTY))
     print("## Activation:{} ##".format(ACTIVATION))
 
-    if not os.path.isdir("models/"+BASE_NAME):
-        os.makedirs("models/"+BASE_NAME)
+    if not os.path.isdir("Neural_Network/models/"+BASE_NAME):
+        os.makedirs("Neural_Network/models/"+BASE_NAME)
 
     for i in range(0,n_folds):
         print("## Fold:{} ##".format(i))
@@ -60,9 +58,9 @@ def n_fold(n_folds = 10, save = True, test = False):
 
         with tf.Graph().as_default():
             # Load all the data into the work place
-            train_data = np.load(os.path.join("..", "data", "processed", "{}_training.npy".format(i)))
-            validation_data = np.load(os.path.join("..", "data", "processed", "{}_validation.npy".format(i)))
-            test_data = np.load(os.path.join("..", "data", "processed",  "{}_test.npy".format(i)))
+            train_data = np.load(os.path.join("data", "processed", "{}_training.npy".format(i)))
+            validation_data = np.load(os.path.join("data", "processed", "{}_validation.npy".format(i)))
+            test_data = np.load(os.path.join("data", "processed",  "{}_test.npy".format(i)))
             if test:
                 # Join training and validation data for the final test
                 train_data = np.concatenate((train_data, validation_data), axis=0)
@@ -85,22 +83,21 @@ def n_fold(n_folds = 10, save = True, test = False):
             net.train(X_train,Y_train,X_val,Y_val, epochs=EPOCHS, batch_size = N_BATCHES, save=save, file_path="models")
             y_pred = net.predict(X_val)
             # Plot confusion matrix
-            plot_confusion_matrix(y_test, y_pred, BASE_NAME, normalize=True, fold=i)
+            plot_confusion_matrix(y_test, y_pred, BASE_NAME,model="Neural_Network", normalize=True, fold=i)
             # and not normalized as well
-            plot_confusion_matrix(y_test, y_pred, BASE_NAME, normalize=False, fold=i)
-            calculate_scores(y_test, y_pred, BASE_NAME, fold=i)
+            plot_confusion_matrix(y_test, y_pred, BASE_NAME,model="Neural_Network", normalize=False, fold=i)
+            calculate_scores(y_test, y_pred, BASE_NAME,model="Neural_Network", fold=i)
 
             # Get the validation accracy for one fold
             accuracy = net.evaluate_model(X_val,Y_val)
-            print("## Validation Accuracy:{} ##".format(accuracy))
+            print("## Validation Accuracy:{} ##".format(accuracy[0]))
             accuracies.append(accuracy)
         if test:
             break
 
-    print("### Finished n-fold cross validation ###")
+        if not test:
+            print("### Finished n-fold cross validation ###")
+        else:
+            print("### Finished final test ###")
     final_accuracy = np.mean(np.array(accuracies))
     print("##### Average Accuracy:{} ######".format(final_accuracy))
-
-
-if __name__ == "__main__":
-    n_fold(test = TEST)

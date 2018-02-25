@@ -59,9 +59,9 @@ class LinearRegressionClassifier:
         self.losses = np.convolve(self.losses, np.ones((N,))/N)[(N-1):]
 
         if save:
-            if not os.path.isdir(file_path+"/"+self.base_name+"/"+self.name):
-                os.makedirs(file_path+"/"+self.base_name+"/"+self.name)
-            self.save("{}/{}/{}/{}".format(file_path, self.base_name, self.name, self.name))
+            if not os.path.isdir("Linear_Classifier"+"/"+file_path+"/"+self.base_name+"/"+self.name):
+                os.makedirs("Linear_Classifier"+"/"+self.base_name+"/"+self.name)
+            self.save("Linear_Classifier/{}/{}/{}/{}".format(file_path, self.base_name, self.name, self.name))
 
     def evaluate_model(self, X,Y):
         if X.size == 0 or Y.size == 0:
@@ -80,51 +80,51 @@ class LinearRegressionClassifier:
         # Visualize the loss function
         plt.figure()
         plt.semilogy(np.arange(len(self.losses)), self.losses, 'bo', np.arange(len(self.losses)), self.losses, 'k')
-        if not os.path.isdir("{}/{}/{}".format("logs", self.base_name, self.name)):
-            os.makedirs("{}/{}/{}/".format("logs", self.base_name, self.name))
+        if not os.path.isdir("Linear_Classifier/{}/{}/{}".format("logs", self.base_name, self.name)):
+            os.makedirs("Linear_Classifier/{}/{}/{}/".format("logs", self.base_name, self.name))
         plt.title("Plot of loss function for {}".format(self.name))
         plt.xlabel("Iterations")
         plt.ylabel("Loss")
         plt.grid(True)
-        plt.savefig("{}/{}/{}/loss_{}.png".format("logs", self.base_name, self.name, self.name))
+        plt.savefig("Linear_Classifier/{}/{}/{}/loss_{}.png".format("logs", self.base_name, self.name, self.name))
         plt.close()
 
         # Visualize the training accuracy
         plt.figure()
         plt.plot(np.arange(len(self.accuracies_train)), self.accuracies_train, 'bo', np.arange(len(self.accuracies_train)), self.accuracies_train, 'k')
-        if not os.path.isdir("{}/{}/{}".format("logs", self.base_name, self.name)):
-            os.makedirs("{}/{}/{}/".format("logs", self.base_name, self.name))
+        if not os.path.isdir("Linear_Classifier/{}/{}/{}".format("logs", self.base_name, self.name)):
+            os.makedirs("Linear_Classifier/{}/{}/{}/".format("logs", self.base_name, self.name))
         plt.title("Plot of training accuracy for {}".format(self.name))
         plt.xlabel("Iterations")
         plt.ylabel("Training accuracy")
         plt.grid(True)
-        plt.savefig("{}/{}/{}/t_error_{}.png".format("logs", self.base_name, self.name, self.name))
+        plt.savefig("Linear_Classifier/{}/{}/{}/t_error_{}.png".format("logs", self.base_name, self.name, self.name))
         plt.close()
 
         # Visualize the validation accuracy
         plt.figure()
         plt.plot(np.arange(len(self.accuracies_val)), self.accuracies_val, 'bo', np.arange(len(self.accuracies_val)), self.accuracies_val, 'k')
-        if not os.path.isdir("{}/{}/{}".format("logs", self.base_name, self.name)):
-            os.makedirs("{}/{}/{}/".format("logs", self.base_name, self.name))
+        if not os.path.isdir("Linear_Classifier/{}/{}/{}".format("logs", self.base_name, self.name)):
+            os.makedirs("Linear_Classifier/{}/{}/{}/".format("logs", self.base_name, self.name))
         plt.title("Plot of training accuracy for {}".format(self.name))
         plt.xlabel("Iterations")
         plt.ylabel("Validation accuracy")
         plt.grid(True)
-        plt.savefig("{}/{}/{}/v_error_{}.png".format("logs", self.base_name, self.name, self.name))
+        plt.savefig("Linear_Classifier/{}/{}/{}/v_error_{}.png".format("logs", self.base_name, self.name, self.name))
         plt.close()
 
         # Visualize the validation and training accuracy together
         plt.figure()
         plt.plot(np.arange(len(self.accuracies_train)), self.accuracies_train, label="Training Accuracy")
         plt.plot(np.arange(len(self.accuracies_val)), self.accuracies_val, label = "Validation Accuracy")
-        if not os.path.isdir("{}/{}/{}".format("logs", self.base_name, self.name)):
-            os.makedirs("{}/{}/{}/".format("logs", self.base_name, self.name))
+        if not os.path.isdir("Linear_Classifier/{}/{}/{}".format("logs", self.base_name, self.name)):
+            os.makedirs("Linear_Classifier/{}/{}/{}/".format("logs", self.base_name, self.name))
         plt.title("Plot of T. accuracy and V. accuracy for {}".format(self.name))
         plt.xlabel("Iterations")
         plt.legend()
         plt.ylabel("Accuracy")
         plt.grid(True)
-        plt.savefig("{}/{}/{}/t_v_error_{}.png".format("logs", self.base_name, self.name, self.name))
+        plt.savefig("Linear_Classifier/{}/{}/{}/t_v_error_{}.png".format("logs", self.base_name, self.name, self.name))
         plt.close()
 
 

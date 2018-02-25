@@ -3,3 +3,4 @@ numpy
 tensorflow
 tflearn
 scikit-learn
+scipy
