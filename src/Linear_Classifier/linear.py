@@ -5,6 +5,7 @@ import sys
 import matplotlib.pyplot as plt
 import io
 import numpy as np
+import copy
 
 class LinearRegressionClassifier:
     """
@@ -17,36 +18,45 @@ class LinearRegressionClassifier:
         self.clf = None
 
     # Trains the classifier
-    def train(self,X_train,Y_train,loss="squared_loss",epochs=20,regularizer="l2",regularizer_penalty=0.0001, stop=0.001, save=False, file_path="models"):
+    def train(self,X_train,Y_train,X_val, Y_val, loss="squared_loss",epochs=20,n_batches=10,regularizer="l2",regularizer_penalty=0.0001, stop=0.001, save=False, file_path="models"):
         if X_train.size == 0 or Y_train.size == 0:
             raise EmptyDataError("No data to train on!")
 
+        self.accuracies_train = []
+        self.accuracies_val = []
+
+        # Separate the data into mini-batches
+        X_train_batches = np.array_split(X_train, n_batches)
+        Y_train_batches = np.array_split(Y_train, n_batches)
+
+
         old_stdout = sys.stdout
         sys.stdout = mystdout = io.StringIO()
+        # Initialize the classifier
         self.clf = linear_model.SGDClassifier(alpha=regularizer_penalty, average=False, class_weight=None, epsilon=0.1,
-                                              learning_rate='optimal', loss=loss, max_iter=epochs, fit_intercept=True,
+                                              n_jobs = 1, learning_rate='optimal', loss=loss, max_iter=1, fit_intercept=False,
                                               penalty=regularizer, tol=stop, verbose=1, warm_start=True)
 
-        self.clf.fit(X_train,Y_train)
+        # Train for the maximum number of epochs
+        for i in range(epochs):
+            for j in range(len(X_train_batches)):
+                self.clf.partial_fit(X_train_batches[j],Y_train_batches[j], classes=np.unique(Y_train))
+                accuracy_train = self.evaluate_model(X_train, Y_train)
+                accuracy_val = self.evaluate_model(X_val, Y_val)
+                self.accuracies_train.append(accuracy_train)
+                self.accuracies_val.append(accuracy_val)
+
         sys.stdout = old_stdout
         loss_history = mystdout.getvalue()
-        self.loss_list = []
+        self.losses = []
 
         for line in loss_history.split('\n'):
             if(len(line.split("loss: ")) == 1):
                 continue
-            self.loss_list.append(float(line.split("loss: ")[-1]))
+            self.losses.append(float(line.split("loss: ")[-1]))
 
-        new_loss = []
-        prev = float("inf")
-        for val in self.loss_list:
-            if prev>val:
-                new_loss.append(val)
-                prev = val
-            else:
-                break
-        self.loss_list = new_loss
-
+        N = 8
+        self.losses = np.convolve(self.losses, np.ones((N,))/N)[(N-1):]
 
         if save:
             if not os.path.isdir(file_path+"/"+self.base_name+"/"+self.name):
@@ -66,15 +76,55 @@ class LinearRegressionClassifier:
 
         return (1-error/X.shape[0])
 
-    def visualize_loss(self, file_path=None):
+    def visualize(self, file_path=None):
+        # Visualize the loss function
         plt.figure()
-        plt.semilogy(np.arange(len(self.loss_list)), self.loss_list)
+        plt.semilogy(np.arange(len(self.losses)), self.losses, 'bo', np.arange(len(self.losses)), self.losses, 'k')
         if not os.path.isdir("{}/{}/{}".format("logs", self.base_name, self.name)):
             os.makedirs("{}/{}/{}/".format("logs", self.base_name, self.name))
         plt.title("Plot of loss function for {}".format(self.name))
-        plt.xlabel("Epochs")
+        plt.xlabel("Iterations")
         plt.ylabel("Loss")
-        plt.savefig("{}/{}/{}/{}.png".format("logs", self.base_name, self.name, self.name))
+        plt.grid(True)
+        plt.savefig("{}/{}/{}/loss_{}.png".format("logs", self.base_name, self.name, self.name))
+        plt.close()
+
+        # Visualize the training accuracy
+        plt.figure()
+        plt.plot(np.arange(len(self.accuracies_train)), self.accuracies_train, 'bo', np.arange(len(self.accuracies_train)), self.accuracies_train, 'k')
+        if not os.path.isdir("{}/{}/{}".format("logs", self.base_name, self.name)):
+            os.makedirs("{}/{}/{}/".format("logs", self.base_name, self.name))
+        plt.title("Plot of training accuracy for {}".format(self.name))
+        plt.xlabel("Iterations")
+        plt.ylabel("Training accuracy")
+        plt.grid(True)
+        plt.savefig("{}/{}/{}/t_error_{}.png".format("logs", self.base_name, self.name, self.name))
+        plt.close()
+
+        # Visualize the validation accuracy
+        plt.figure()
+        plt.plot(np.arange(len(self.accuracies_val)), self.accuracies_val, 'bo', np.arange(len(self.accuracies_val)), self.accuracies_val, 'k')
+        if not os.path.isdir("{}/{}/{}".format("logs", self.base_name, self.name)):
+            os.makedirs("{}/{}/{}/".format("logs", self.base_name, self.name))
+        plt.title("Plot of training accuracy for {}".format(self.name))
+        plt.xlabel("Iterations")
+        plt.ylabel("Validation accuracy")
+        plt.grid(True)
+        plt.savefig("{}/{}/{}/v_error_{}.png".format("logs", self.base_name, self.name, self.name))
+        plt.close()
+
+        # Visualize the validation and training accuracy together
+        plt.figure()
+        plt.plot(np.arange(len(self.accuracies_train)), self.accuracies_train, label="Training Accuracy")
+        plt.plot(np.arange(len(self.accuracies_val)), self.accuracies_val, label = "Validation Accuracy")
+        if not os.path.isdir("{}/{}/{}".format("logs", self.base_name, self.name)):
+            os.makedirs("{}/{}/{}/".format("logs", self.base_name, self.name))
+        plt.title("Plot of T. accuracy and V. accuracy for {}".format(self.name))
+        plt.xlabel("Iterations")
+        plt.legend()
+        plt.ylabel("Accuracy")
+        plt.grid(True)
+        plt.savefig("{}/{}/{}/t_v_error_{}.png".format("logs", self.base_name, self.name, self.name))
         plt.close()
 
 

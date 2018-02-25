@@ -7,7 +7,6 @@ from network import Network
 import tensorflow as tf
 
 # Initialize the basic parameters of the network
-BASE_NAME = "attempt0"
 LEARNING_RATE = 0.001
 HIDDEN_LAYERS = 3
 HIDDEN_NEURONS = 1000
@@ -15,10 +14,11 @@ REGULARIZER = "L2"
 REGULARIZATION_PENALTY = 0.001
 ACTIVATION = "relu"
 EPOCHS = 5
-BATCH_SIZE = 64
+N_BATCHES = 10
 DROPOUT = 0.8
 BETA1= 0.99
 TEST = False
+BASE_NAME = str(HIDDEN_LAYERS) + "_" + str(HIDDEN_NEURONS) + "_" + str(DROPOUT) + "_" + str(REGULARIZER) + "_" + str(REGULARIZER_PENALTY) + "_" + str(ACTIVATION)
 
 # Convert labels into one-hot encoding
 def one_hot(labels):
@@ -44,7 +44,7 @@ def n_fold(n_folds = 10, save = True):
     print("## Hidden neurons:{} ##".format(HIDDEN_NEURONS))
     print("## Hidden layers:{} ##".format(HIDDEN_LAYERS))
     print("## Epochs:{} ##".format(EPOCHS))
-    print("## Batch Size:{} ##".format(BATCH_SIZE))
+    print("## Batch Size:{} ##".format(N_BATCHES))
     print("## Regularizer:{} ##".format(REGULARIZER))
     print("## Regularizer penalty:{} ##".format(REGULARIZATION_PENALTY))
     print("## Activation:{} ##".format(ACTIVATION))
@@ -72,7 +72,7 @@ def n_fold(n_folds = 10, save = True):
 
             # Train the network and optimize it with using the validation set
             # Or train the final network and compute the actual test error
-            net.train(X_train,Y_train,X_val,Y_val, epochs=EPOCHS, batch_size = BATCH_SIZE, save=save, file_path="models")
+            net.train(X_train,Y_train,X_val,Y_val, epochs=EPOCHS, batch_size = N_BATCHES, save=save, file_path="models")
 
             # Get the validation accracy for one fold
             accuracy = net.evaluate_model(X_val,Y_val)
@@ -91,7 +91,7 @@ def final_model(save = True):
     print("## Hidden neurons:{} ##".format(HIDDEN_NEURONS))
     print("## Hidden layers:{} ##".format(HIDDEN_LAYERS))
     print("## Epochs:{} ##".format(EPOCHS))
-    print("## Batch Size:{} ##".format(BATCH_SIZE))
+    print("## Batch Size:{} ##".format(N_BATCHES))
     print("## Regularizer:{} ##".format(REGULARIZER))
     print("## Regularizer penalty:{} ##".format(REGULARIZER_PENALTY))
     print("## Activation:{} ##".format(ACTIVATION))
@@ -120,7 +120,7 @@ def final_model(save = True):
         net.init_self_net(HIDDEN_LAYERS, HIDDEN_NEURONS,dropout = DROPOUT, beta1=BETA1, lr=LEARNING_RATE, activation = ACTIVATION, regularizer = REGULARIZER, regularizer_penalty=REGULARIZATION_PENALTY)
 
         # Train the network for the final time
-        net.train(X_train,Y_train,X_test,Y_test, epochs=EPOCHS, batch_size = BATCH_SIZE, save=save, file_path="models")
+        net.train(X_train,Y_train,X_test,Y_test, epochs=EPOCHS, batch_size = N_BATCHES, save=save, file_path="models")
 
         # Get the validation accracy for one fold
         accuracy = net.evaluate_model(X_test,Y_test)
