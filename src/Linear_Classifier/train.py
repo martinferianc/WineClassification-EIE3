@@ -5,6 +5,7 @@ import numpy as np
 
 from visualize import visualize
 from linear import LinearRegressionClassifier
+from postprocess import plot_confusion_matrix, calculate_scores
 
 # Initialize the basic parameters of the network
 LEARNING_RATE = 0.01
@@ -12,7 +13,7 @@ LOSS = "squared_loss"
 STOP = 0.0000001
 REGULARIZER = "L2"
 REGULARIZATION_PENALTY = 0.01
-EPOCHS = 5
+EPOCHS = 1
 N_BATCHES = 5
 TEST = False
 BASE_NAME = str(LEARNING_RATE) + "_" + str(LOSS) + "_" + str(STOP) + "_" + str(REGULARIZER) + "_" + str(REGULARIZATION_PENALTY) + "_" + str(EPOCHS) + "_" + str(N_BATCHES)
@@ -54,6 +55,7 @@ def n_fold(n_folds = 10, save = True, test = False):
 
         # Separete the labels from the features and do one hot encoding for the neural network
         X_train, Y_train = separete_data(train_data)
+
         if test:
             X_val, Y_val = separete_data(test_data)
         else:
@@ -73,10 +75,19 @@ def n_fold(n_folds = 10, save = True, test = False):
 
         # Get the validation accracy for one fold
         accuracy = clf.evaluate_model(X_val,Y_val)
+        y_pred = clf.predict(X_val)
+
+        # Plot confusion matrix
+        plot_confusion_matrix(Y_val, y_pred, BASE_NAME, normalize=True, fold=i)
+        # and not normalized as well
+        plot_confusion_matrix(Y_val, y_pred, BASE_NAME, normalize=False, fold=i)
+        calculate_scores(Y_val, y_pred, BASE_NAME, fold=i)
         print("## Validation Accuracy:{} ##".format(accuracy))
         accuracies.append(accuracy)
         # Delete the previous classifier to avoid retraining
         del clf
+        if test:
+            break
 
     visualize(accuracies_train, accuracies_val, losses, BASE_NAME)
     print("### Finished n-fold cross validation ###")
