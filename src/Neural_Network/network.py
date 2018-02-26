@@ -8,7 +8,7 @@ import numpy as np
 
 class Network:
     """
-    This is a wrapper class for the network structure
+    This is a wrapper class for the neural network structure
     """
     def __init__(self, name, base_name):
         self.base_name = base_name
@@ -16,19 +16,23 @@ class Network:
         self.model = None
         self.net = None
 
-    #Initializes the self.net
+    #Initializes the network
     def init_self_net(self ,hidden_layers, hidden_neurons,drop=0.8,beta1=0.99,lr=0.001, activation="relu", n_features=11, n_classes=11, regularizer="", regularization_penalty=0.001):
         self.net = input_data(shape=[None, n_features], name='input')
         for i in range(hidden_layers):
-            self.net = fully_connected(self.net, hidden_neurons, activation=activation, regularizer=regularizer, weight_decay=regularization_penalty)
+            if i == hidden_layers-1:
+                self.net = fully_connected(self.net, hidden_neurons, activation="tanh", regularizer=regularizer, weight_decay=regularization_penalty)
+            else:
+                self.net = fully_connected(self.net, hidden_neurons, activation=activation, regularizer=regularizer, weight_decay=regularization_penalty)
             self.net = dropout(self.net, drop)
         self.net = fully_connected(self.net, n_classes, activation='softmax')
 
         # Define the optimizer
         o = Adam(learning_rate=lr, beta1=beta1)
         self.net = regression(self.net, optimizer=o, loss='softmax_categorical_crossentropy', name='targets')
-        return self.net
 
+        return self.net
+    # Trains the netowk and stores all the outputs and logs in the respective directories
     def train(self,X_train,Y_train,X_val,Y_val,epochs=5, batch_size = 64, save=False, file_path="models"):
         if self.net is None:
             raise EmptyNetError("No self.net to be trained!")

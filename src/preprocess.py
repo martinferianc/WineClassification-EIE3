@@ -5,14 +5,13 @@ from tqdm import tqdm
 
 BASE_DIR = "data/"
 
-# Load the data and convert it into numpy matrices
 
 # Load the dataset in csv format and set the delimiter
 def load_data(file_path):
     data = np.genfromtxt(file_path, delimiter=";")
     return data
 
-
+# Loads a particular dataset which is needed at a time
 def load_data_set(data_quality, fold=0, d_set="training", base_dir=BASE_DIR + "processed"):
     file_path = base_dir + "/{0}/{1}{2}.npy".format(data_quality, fold, d_set)
     print("Loading file: {0}".format(file_path))
@@ -35,10 +34,8 @@ def normalize(data):
 
 # Split the data into n folds of training, test and validation data
 def n_fold(data, target_dir, n=10, validation=0.1, test=0.1):
-    # Load the target data into two vars
-
     # Reshuffle the data to avoid any clusters
-    data = np.take(data,np.random.permutation(data.shape[0]),axis=0,out=data)
+    np.random.shuffle(data)
 
     #Normalize all the data
     data = normalize(data)
@@ -66,6 +63,7 @@ def n_fold(data, target_dir, n=10, validation=0.1, test=0.1):
         np.save(target_dir + "{0}_training.npy".format(i), training_data)
         np.save(target_dir + "{0}_validation.npy".format(i), validation_data)
 
+# Builds the datasets and normalizes them
 def build_data_sets(types = ["red", "white"]):
     print("### Beginning preprocessing ###")
     file_path_red = (BASE_DIR + "raw/winequality-red.csv")
@@ -74,6 +72,7 @@ def build_data_sets(types = ["red", "white"]):
     print("Loading files")
     data_red = load_data(file_path_red)
     data_white = load_data(file_path_white)
+    # Join the red and white wines togeter 
     data = np.concatenate((data_red,data_white), axis = 0)
     n_fold(copy.deepcopy(data), BASE_DIR + "processed/")
     print("### Finished preprocessing ###")

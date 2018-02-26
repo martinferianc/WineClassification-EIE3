@@ -7,17 +7,6 @@ from .visualize import visualize
 from .linear import LinearRegressionClassifier
 from postprocess import plot_confusion_matrix, calculate_scores
 
-# Initialize the basic parameters of the network
-model = {}
-model["LEARNING_RATE"] = 0.01
-model["LOSS"] = "squared_loss"
-model["STOP"] = 0.0000001
-model["REGULARIZER"] = "L2"
-model["REGULARIZATION_PENALTY"] = 0.01
-model["EPOCHS"] = 1
-model["N_BATCHES"] = 5
-model["TEST"] = False
-
 # Separete the labels from the features
 def separete_data(data):
     features = np.array(copy.deepcopy([x[:-1] for x in data]), dtype=np.float64)
@@ -26,15 +15,16 @@ def separete_data(data):
 
 # This function performs training for the specific network and performs n_fold cross validation
 def n_fold(model, n_folds = 10, save = True, test = False):
-    LEARNING_RATE = model["LEARNING_RATE"]
+    LEARNING_RATE = float(model["LEARNING_RATE"])
     LOSS = model["LOSS"]
-    STOP = model["STOP"]
+    STOP = float(model["STOP"])
     REGULARIZER = model["REGULARIZER"]
-    REGULARIZATION_PENALTY = model["REGULARIZATION_PENALTY"]
-    EPOCHS = model["EPOCHS"]
-    N_BATCHES = model["N_BATCHES"]
+    REGULARIZATION_PENALTY = float(model["REGULARIZATION_PENALTY"])
+    EPOCHS = int(model["EPOCHS"])
+    N_BATCHES = int(model["N_BATCHES"])
     BASE_NAME = str(LEARNING_RATE) + "_" + str(LOSS) + "_" + str(STOP) + "_" + str(REGULARIZER) + "_" + str(REGULARIZATION_PENALTY) + "_" + str(EPOCHS) + "_" + str(N_BATCHES)
 
+    # initialize all the lists required to store the values
     accuracies_val = []
     accuracies_train = []
     accuracies = []
@@ -47,8 +37,12 @@ def n_fold(model, n_folds = 10, save = True, test = False):
     print("## Regularizer:{} ##".format(REGULARIZER))
     print("## Regularizer penalty:{} ##".format(REGULARIZATION_PENALTY))
 
+    # Create the necessary directories
     if not os.path.isdir("Linear_Classifier/models/"+BASE_NAME):
         os.makedirs("Linear_Classifier/models/"+BASE_NAME)
+
+    if not os.path.isdir("Linear_Classifier/logs/"+BASE_NAME):
+        os.makedirs("Linear_Classifier/logs/"+BASE_NAME)
 
     for i in range(0,n_folds):
         print("## Fold:{} ##".format(i))
@@ -58,6 +52,7 @@ def n_fold(model, n_folds = 10, save = True, test = False):
         train_data = np.load(os.path.join("data", "processed", "{}_training.npy".format(i)))
         validation_data = np.load(os.path.join("data", "processed", "{}_validation.npy".format(i)))
         test_data = np.load(os.path.join("data", "processed",  "{}_test.npy".format(i)))
+
         if test:
             # Join training and validation data for the final test
             train_data = np.concatenate((train_data, validation_data), axis=0)
@@ -77,6 +72,7 @@ def n_fold(model, n_folds = 10, save = True, test = False):
         # Train the classifier
         clf.train(X_train,Y_train,X_val,Y_val,n_batches = N_BATCHES, epochs=EPOCHS, loss = LOSS, regularizer = REGULARIZER, regularizer_penalty = REGULARIZATION_PENALTY, stop = STOP, save=save, file_path="models")
         clf.visualize()
+
         # Copy the training accuracy, loss and validation accuracy per fold
         accuracies_val.append(copy.deepcopy(clf.accuracies_val))
         accuracies_train.append(copy.deepcopy(clf.accuracies_train))
@@ -90,22 +86,25 @@ def n_fold(model, n_folds = 10, save = True, test = False):
         plot_confusion_matrix(Y_val, y_pred, BASE_NAME,model="Linear_Classifier", normalize=True, fold=i)
         # and not normalized as well
         plot_confusion_matrix(Y_val, y_pred, BASE_NAME,model="Linear_Classifier", normalize=False, fold=i)
+
+        # Calculate also Recall and precision
         calculate_scores(Y_val, y_pred, BASE_NAME, model="Linear_Classifier", fold=i)
+
         print("## Validation Accuracy:{} ##".format(accuracy))
         accuracies.append(accuracy)
+
         # Delete the previous classifier to avoid retraining
         del clf
         if test:
             break
 
+    # Visualize all folds in one plot
     visualize(accuracies_train, accuracies_val, losses, BASE_NAME)
     if not test:
         print("### Finished n-fold cross validation ###")
     else:
         print("### Finished final test ###")
+
+    # Calculate the average accuracy
     final_accuracy = np.mean(np.array(accuracies))
     print("##### Average Accuracy:{} ######".format(final_accuracy))
-
-
-if __name__ == "__main__":
-    n_fold(model, test = False)

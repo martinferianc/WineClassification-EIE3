@@ -37,7 +37,7 @@ class LinearRegressionClassifier:
                                               n_jobs = 1, learning_rate='optimal', loss=loss, max_iter=1, fit_intercept=False,
                                               penalty=regularizer, tol=stop, verbose=1, warm_start=True)
 
-        # Train for the maximum number of epochs
+        # Train for the maximum number of epochs and iteration
         for i in range(epochs):
             for j in range(len(X_train_batches)):
                 self.clf.partial_fit(X_train_batches[j],Y_train_batches[j], classes=np.unique(Y_train))
@@ -46,6 +46,7 @@ class LinearRegressionClassifier:
                 self.accuracies_train.append(accuracy_train)
                 self.accuracies_val.append(accuracy_val)
 
+        # Extract the loss from the printfs
         sys.stdout = old_stdout
         loss_history = mystdout.getvalue()
         self.losses = []
@@ -54,13 +55,14 @@ class LinearRegressionClassifier:
             if(len(line.split("loss: ")) == 1):
                 continue
             self.losses.append(float(line.split("loss: ")[-1]))
+        # Losses for all 7 different classifiers are outputed therefore average the loss between all of them
 
-        N = 8
+        N = 7
         self.losses = np.convolve(self.losses, np.ones((N,))/N)[(N-1):]
 
         if save:
-            if not os.path.isdir("Linear_Classifier"+"/"+file_path+"/"+self.base_name+"/"+self.name):
-                os.makedirs("Linear_Classifier"+"/"+self.base_name+"/"+self.name)
+            if not os.path.isdir("Linear_Classifier"+"/models/"+self.base_name+"/"+self.name):
+                os.makedirs("Linear_Classifier"+"/models/"+self.base_name+"/"+self.name)
             self.save("Linear_Classifier/{}/{}/{}/{}".format(file_path, self.base_name, self.name, self.name))
 
     def evaluate_model(self, X,Y):
@@ -77,11 +79,12 @@ class LinearRegressionClassifier:
         return (1-error/X.shape[0])
 
     def visualize(self, file_path=None):
+        if not os.path.isdir("Linear_Classifier/{}/{}/{}".format("logs", self.base_name, self.name)):
+            os.makedirs("Linear_Classifier/{}/{}/{}/".format("logs", self.base_name, self.name))
+
         # Visualize the loss function
         plt.figure()
         plt.semilogy(np.arange(len(self.losses)), self.losses, 'bo', np.arange(len(self.losses)), self.losses, 'k')
-        if not os.path.isdir("Linear_Classifier/{}/{}/{}".format("logs", self.base_name, self.name)):
-            os.makedirs("Linear_Classifier/{}/{}/{}/".format("logs", self.base_name, self.name))
         plt.title("Plot of loss function for {}".format(self.name))
         plt.xlabel("Iterations")
         plt.ylabel("Loss")
@@ -92,8 +95,6 @@ class LinearRegressionClassifier:
         # Visualize the training accuracy
         plt.figure()
         plt.plot(np.arange(len(self.accuracies_train)), self.accuracies_train, 'bo', np.arange(len(self.accuracies_train)), self.accuracies_train, 'k')
-        if not os.path.isdir("Linear_Classifier/{}/{}/{}".format("logs", self.base_name, self.name)):
-            os.makedirs("Linear_Classifier/{}/{}/{}/".format("logs", self.base_name, self.name))
         plt.title("Plot of training accuracy for {}".format(self.name))
         plt.xlabel("Iterations")
         plt.ylabel("Training accuracy")
@@ -104,8 +105,6 @@ class LinearRegressionClassifier:
         # Visualize the validation accuracy
         plt.figure()
         plt.plot(np.arange(len(self.accuracies_val)), self.accuracies_val, 'bo', np.arange(len(self.accuracies_val)), self.accuracies_val, 'k')
-        if not os.path.isdir("Linear_Classifier/{}/{}/{}".format("logs", self.base_name, self.name)):
-            os.makedirs("Linear_Classifier/{}/{}/{}/".format("logs", self.base_name, self.name))
         plt.title("Plot of training accuracy for {}".format(self.name))
         plt.xlabel("Iterations")
         plt.ylabel("Validation accuracy")
@@ -117,8 +116,6 @@ class LinearRegressionClassifier:
         plt.figure()
         plt.plot(np.arange(len(self.accuracies_train)), self.accuracies_train, label="Training Accuracy")
         plt.plot(np.arange(len(self.accuracies_val)), self.accuracies_val, label = "Validation Accuracy")
-        if not os.path.isdir("Linear_Classifier/{}/{}/{}".format("logs", self.base_name, self.name)):
-            os.makedirs("Linear_Classifier/{}/{}/{}/".format("logs", self.base_name, self.name))
         plt.title("Plot of T. accuracy and V. accuracy for {}".format(self.name))
         plt.xlabel("Iterations")
         plt.legend()

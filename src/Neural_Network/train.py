@@ -7,7 +7,7 @@ from .network import Network
 import tensorflow as tf
 from .postprocess import plot_confusion_matrix, calculate_scores
 
-# Convert labels into one-hot encoding
+# Convert labels into one-hot representation
 def one_hot(labels):
     n_values = 11
     labels.astype(int)
@@ -26,16 +26,16 @@ def separete_data(data):
 def n_fold(model, n_folds = 10, save = True, test = False):
     accuracies = []
 
-    LEARNING_RATE = model["LEARNING_RATE"]
-    HIDDEN_LAYERS =model["HIDDEN_LAYERS"]
-    HIDDEN_NEURONS = model["HIDDEN_NEURONS"]
+    LEARNING_RATE = float(model["LEARNING_RATE"])
+    HIDDEN_LAYERS =int(model["HIDDEN_LAYERS"])
+    HIDDEN_NEURONS = int(model["HIDDEN_NEURONS"])
     REGULARIZER = model["REGULARIZER"]
-    REGULARIZATION_PENALTY = model["REGULARIZATION_PENALTY"]
+    REGULARIZATION_PENALTY = float(model["REGULARIZATION_PENALTY"])
     ACTIVATION = model["ACTIVATION"]
-    EPOCHS = model["EPOCHS"]
-    N_BATCHES = model["N_BATCHES"]
-    DROPOUT = model["DROPOUT"]
-    BETA1 = model["BETA1"]
+    EPOCHS = int(model["EPOCHS"])
+    N_BATCHES = int(model["N_BATCHES"])
+    DROPOUT = float(model["DROPOUT"])
+    BETA1 = float(model["BETA1"])
     BASE_NAME = str(HIDDEN_LAYERS) + "_" + str(HIDDEN_NEURONS) + "_" + str(DROPOUT) + "_" + str(REGULARIZER) + "_" + str(REGULARIZATION_PENALTY) + "_" + str(ACTIVATION)
 
     print("### Beginning n-fold cross validation with parameters: ###")
@@ -52,6 +52,9 @@ def n_fold(model, n_folds = 10, save = True, test = False):
     if not os.path.isdir("Neural_Network/models/"+BASE_NAME):
         os.makedirs("Neural_Network/models/"+BASE_NAME)
 
+    if not os.path.isdir("Neural_Network/logs/"):
+        os.makedirs("Neural_Network/logs")
+
     for i in range(0,n_folds):
         print("## Fold:{} ##".format(i))
         # Begin each training completely separetely
@@ -61,6 +64,7 @@ def n_fold(model, n_folds = 10, save = True, test = False):
             train_data = np.load(os.path.join("data", "processed", "{}_training.npy".format(i)))
             validation_data = np.load(os.path.join("data", "processed", "{}_validation.npy".format(i)))
             test_data = np.load(os.path.join("data", "processed",  "{}_test.npy".format(i)))
+
             if test:
                 # Join training and validation data for the final test
                 train_data = np.concatenate((train_data, validation_data), axis=0)
@@ -82,22 +86,27 @@ def n_fold(model, n_folds = 10, save = True, test = False):
             # Or train the final network and compute the actual test error
             net.train(X_train,Y_train,X_val,Y_val, epochs=EPOCHS, batch_size = N_BATCHES, save=save, file_path="models")
             y_pred = net.predict(X_val)
+
             # Plot confusion matrix
             plot_confusion_matrix(y_test, y_pred, BASE_NAME,model="Neural_Network", normalize=True, fold=i)
             # and not normalized as well
             plot_confusion_matrix(y_test, y_pred, BASE_NAME,model="Neural_Network", normalize=False, fold=i)
+
+            # Calculate precision, and recall store that as well
             calculate_scores(y_test, y_pred, BASE_NAME,model="Neural_Network", fold=i)
 
             # Get the validation accracy for one fold
             accuracy = net.evaluate_model(X_val,Y_val)
             print("## Validation Accuracy:{} ##".format(accuracy[0]))
             accuracies.append(accuracy)
-        if test:
-            break
 
         if not test:
             print("### Finished n-fold cross validation ###")
         else:
             print("### Finished final test ###")
+
+        if test:
+            break
+
     final_accuracy = np.mean(np.array(accuracies))
     print("##### Average Accuracy:{} ######".format(final_accuracy))

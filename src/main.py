@@ -1,27 +1,19 @@
 from Linear_Classifier.train import n_fold as train_lin_model
 from Neural_Network.train import n_fold as train_net_model
+import json
+
+# Load the models from the model directory
+MODEL_DIR = "Models/"
+LIN_MODELS = "lin_models.json"
+NN_MODELS = "nn_models.json"
 
 if __name__ == '__main__':
-    lin_model = {}
-    lin_model["LEARNING_RATE"] = 0.01
-    lin_model["LOSS"] = "squared_loss"
-    lin_model["STOP"] = 0.0000001
-    lin_model["REGULARIZER"] = "L2"
-    lin_model["REGULARIZATION_PENALTY"] = 0.01
-    lin_model["EPOCHS"] = 1
-    lin_model["N_BATCHES"] = 5
-    lin_model["TEST"] = False
-    #train_lin_model(lin_model, test=True)
+    lin_models = json.load(open(MODEL_DIR + LIN_MODELS))
+    nn_models = json.load(open(MODEL_DIR + NN_MODELS))
 
-    net_model = {}
-    net_model["LEARNING_RATE"] = 0.001
-    net_model["HIDDEN_LAYERS"] = 3
-    net_model["HIDDEN_NEURONS"] = 1
-    net_model["REGULARIZER"] = "L2"
-    net_model["REGULARIZATION_PENALTY"] = 0.001
-    net_model["ACTIVATION"] = "relu"
-    net_model["EPOCHS"] = 1
-    net_model["N_BATCHES"] = 10
-    net_model["DROPOUT"] = 0.8
-    net_model["BETA1"]= 0.99
-    train_net_model(net_model, test=True)
+    # Perform bulk training and testing of the winning models
+    for model in lin_models:
+        train_lin_model(lin_models[str(model)], test=False)
+
+    for model in nn_models:
+        train_net_model(nn_models[str(model)], test=False)
