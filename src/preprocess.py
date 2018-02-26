@@ -2,6 +2,11 @@ import numpy as np
 import copy
 import os
 from tqdm import tqdm
+import pandas
+from string import ascii_letters
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 BASE_DIR = "data/"
 
@@ -10,6 +15,43 @@ BASE_DIR = "data/"
 def load_data(file_path):
     data = np.genfromtxt(file_path, delimiter=";")
     return data
+
+# Analyzes the data and generates the covariance matrix
+def analyze_data(data):
+    features = np.array(copy.deepcopy([x[:-1] for x in data]), dtype=np.float64)
+    labels = np.array(copy.deepcopy([x[-1] for x in data]), dtype=np.int32)
+    print("Number of elements per class:")
+    l, c = np.unique(labels, return_counts = True)
+    print("{}, {}".format(l,c))
+
+
+    plt.hist(labels, bins = l)
+    plt.title("Class histogram")
+    plt.xlabel("Class")
+    plt.ylabel("Count")
+    plt.grid(True)
+    plt.savefig("../Figures/{}".format("Class_Histogram.png"))
+    plt.close()
+
+    sns.set(style="white")
+
+    d = pd.DataFrame(data=features)
+
+    # Compute the correlation matrix
+    corr = d.corr()
+
+    fig, ax = plt.subplots(figsize=(11, 11))
+    ax.matshow(corr)
+    plt.xticks(range(len(corr.columns)), corr.columns, fontsize=13);
+    plt.yticks(range(len(corr.columns)), corr.columns, fontsize=13);
+
+    plt.title("Features",fontsize=20)
+    plt.xlabel("Correlation matrix", fontsize=30)
+    plt.ylabel("Features",fontsize=20)
+    plt.savefig("../Figures/{}".format("Correlation_matrix.png"))
+
+    plt.close()
+
 
 # Loads a particular dataset which is needed at a time
 def load_data_set(data_quality, fold=0, d_set="training", base_dir=BASE_DIR + "processed"):
@@ -25,7 +67,6 @@ def normalize(data):
     # Do not normalize the labels!
     for i in tqdm(range(len(data)-1)):
         data[i] = (data[i] - np.mean(data[i]))/np.std(data[i])
-
     # Transpose the data back
     data = np.transpose(data)
 
@@ -37,8 +78,6 @@ def n_fold(data, target_dir, n=10, validation=0.1, test=0.1):
     # Reshuffle the data to avoid any clusters
     np.random.shuffle(data)
 
-    #Normalize all the data
-    data = normalize(data)
     tseg = int((len(data)-1) * test)
     vseg = int((len(data)-1 - tseg) * validation)
     for i in range(0, n):
@@ -72,8 +111,15 @@ def build_data_sets(types = ["red", "white"]):
     print("Loading files")
     data_red = load_data(file_path_red)
     data_white = load_data(file_path_white)
-    # Join the red and white wines togeter 
+
+    # Join the red and white wines togeter
     data = np.concatenate((data_red,data_white), axis = 0)
+
+    #Normalize all the data
+    data = normalize(data)
+
+    analyze_data(data)
+
     n_fold(copy.deepcopy(data), BASE_DIR + "processed/")
     print("### Finished preprocessing ###")
 

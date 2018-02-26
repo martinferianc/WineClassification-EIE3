@@ -3,7 +3,7 @@ The goal is to model wine quality based on physicochemical tests (see [Cortez et
 
 This project was a part of coursework for module EE3-23 Machine Learning at Imperial College London, [Link](http://intranet.ee.ic.ac.uk/electricalengineering/eecourses_t4/course_content.asp?c=EE3-23&s=E3#start)
 
-It considers two plausible methods for classification into quality classes based on the physicochemical tests: Linear Regression Classifier and a Neural Network.
+It considers two plausible methods for classification into quality classes based on the physicochemical tests: _Linear Regression Classifier_ and a _Neural Network_.
 
 ## Structure
 ```
