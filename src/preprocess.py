@@ -18,6 +18,15 @@ def load_data(file_path):
 
 # Analyzes the data and generates the covariance matrix
 def analyze_data(data):
+    data = copy.deepcopy(data)
+    features = np.array(copy.deepcopy([x[:-1] for x in data]), dtype=np.float64)
+
+    d = pd.DataFrame(data=features)
+    metrics = d.describe().loc[['mean','std','min','max']]
+    metrics = metrics.transpose()
+    print(metrics.to_latex())
+
+    data = normalize(data)
     features = np.array(copy.deepcopy([x[:-1] for x in data]), dtype=np.float64)
     labels = np.array(copy.deepcopy([x[-1] for x in data]), dtype=np.int32)
     print("Number of elements per class:")
@@ -115,10 +124,10 @@ def build_data_sets(types = ["red", "white"]):
     # Join the red and white wines togeter
     data = np.concatenate((data_red,data_white), axis = 0)
 
+    analyze_data(data)
+
     #Normalize all the data
     data = normalize(data)
-
-    analyze_data(data)
 
     n_fold(copy.deepcopy(data), BASE_DIR + "processed/")
     print("### Finished preprocessing ###")

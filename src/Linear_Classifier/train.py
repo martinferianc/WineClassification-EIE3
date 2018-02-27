@@ -31,7 +31,7 @@ def n_fold(model, n_folds = 10, save = True, test = False):
     losses = []
 
     print("### Beginning n-fold cross validation with parameters: ###")
-    print("## Classifier name: ##".format(BASE_NAME))
+    print("## Classifier name: {}##".format(BASE_NAME))
     print("## Learning rate:{} ##".format(LEARNING_RATE))
     print("## Epochs:{} ##".format(EPOCHS))
     print("## Regularizer:{} ##".format(REGULARIZER))
@@ -70,7 +70,7 @@ def n_fold(model, n_folds = 10, save = True, test = False):
         clf = LinearRegressionClassifier(name = CLF_NAME, base_name = BASE_NAME)
 
         # Train the classifier
-        clf.train(X_train,Y_train,X_val,Y_val,n_batches = N_BATCHES, epochs=EPOCHS, loss = LOSS, regularizer = REGULARIZER, regularizer_penalty = REGULARIZATION_PENALTY, stop = STOP, save=save, file_path="models")
+        clf.train(X_train,Y_train,X_val,Y_val,learning_rate = LEARNING_RATE, n_batches = N_BATCHES, epochs=EPOCHS, loss = LOSS, regularizer = REGULARIZER, regularizer_penalty = REGULARIZATION_PENALTY, stop = STOP, save=save, file_path="models")
         clf.visualize()
 
         # Copy the training accuracy, loss and validation accuracy per fold
@@ -98,6 +98,7 @@ def n_fold(model, n_folds = 10, save = True, test = False):
         if test:
             break
 
+
     # Visualize all folds in one plot
     visualize(accuracies_train, accuracies_val, losses, BASE_NAME)
     if not test:
@@ -108,3 +109,4 @@ def n_fold(model, n_folds = 10, save = True, test = False):
     # Calculate the average accuracy
     final_accuracy = np.mean(np.array(accuracies))
     print("##### Average Accuracy:{} ######".format(final_accuracy))
+    return final_accuracy, np.mean(accuracies_train, axis = 0), np.mean(accuracies_val, axis = 0), np.mean(losses, axis = 0)

@@ -18,7 +18,7 @@ class LinearRegressionClassifier:
         self.clf = None
 
     # Trains the classifier
-    def train(self,X_train,Y_train,X_val, Y_val, loss="squared_loss",epochs=20,n_batches=10,regularizer="l2",regularizer_penalty=0.0001, stop=0.001, save=False, file_path="models"):
+    def train(self,X_train,Y_train,X_val, Y_val, loss="squared_loss",epochs=20,n_batches=10,regularizer="l2",regularizer_penalty=0.0001,learning_rate="optimal", stop=0.001, save=False, file_path="models"):
         if X_train.size == 0 or Y_train.size == 0:
             raise EmptyDataError("No data to train on!")
 
@@ -34,7 +34,7 @@ class LinearRegressionClassifier:
         sys.stdout = mystdout = io.StringIO()
         # Initialize the classifier
         self.clf = linear_model.SGDClassifier(alpha=regularizer_penalty, average=False, class_weight=None, epsilon=0.1,
-                                              n_jobs = 1, learning_rate='optimal', loss=loss, max_iter=1, fit_intercept=False,
+                                              n_jobs = 1,learning_rate="constant", eta0=learning_rate, loss=loss, max_iter=1, fit_intercept=False,
                                               penalty=regularizer, tol=stop, verbose=1, warm_start=True)
 
         # Train for the maximum number of epochs and iteration
@@ -59,6 +59,8 @@ class LinearRegressionClassifier:
 
         N = 7
         self.losses = np.convolve(self.losses, np.ones((N,))/N)[(N-1):]
+        self.losses = self.losses[:-7]
+        self.losses = self.losses[::N]
 
         if save:
             if not os.path.isdir("Linear_Classifier"+"/models/"+self.base_name+"/"+self.name):
@@ -84,7 +86,7 @@ class LinearRegressionClassifier:
 
         # Visualize the loss function
         plt.figure()
-        plt.semilogy(np.arange(len(self.losses)), self.losses, 'bo', np.arange(len(self.losses)), self.losses, 'k')
+        plt.plot(np.arange(len(self.losses)), self.losses, 'bo', np.arange(len(self.losses)), self.losses, 'k')
         plt.title("Plot of loss function for {}".format(self.name))
         plt.xlabel("Iterations")
         plt.ylabel("Loss")
@@ -105,7 +107,7 @@ class LinearRegressionClassifier:
         # Visualize the validation accuracy
         plt.figure()
         plt.plot(np.arange(len(self.accuracies_val)), self.accuracies_val, 'bo', np.arange(len(self.accuracies_val)), self.accuracies_val, 'k')
-        plt.title("Plot of training accuracy for {}".format(self.name))
+        plt.title("Plot of validation accuracy for {}".format(self.name))
         plt.xlabel("Iterations")
         plt.ylabel("Validation accuracy")
         plt.grid(True)

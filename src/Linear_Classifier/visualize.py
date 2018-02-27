@@ -26,7 +26,7 @@ def visualize(accuracies_train, accuracies_val, losses, name):
 
     plt.figure()
     for i in range(len(losses)):
-        plt.semilogy(np.arange(len(losses[i])), losses[i], label="Fold {}".format(i))
+        plt.plot(np.arange(len(losses[i])), losses[i], label="Fold {}".format(i))
     plt.title("Plot loss for {} folds".format(len(losses)))
     plt.xlabel("Iterations")
     plt.legend()

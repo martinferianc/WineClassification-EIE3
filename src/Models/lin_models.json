@@ -1,11 +1,11 @@
 {
     "0" : {
-        "LEARNING_RATE": 0.01,
-        "LOSS": "squared_loss",
+        "LEARNING_RATE": 0.001,
+        "LOSS": "log",
         "STOP": 0.0000001,
-        "REGULARIZER": "L2",
-        "REGULARIZATION_PENALTY": 0.01,
-        "EPOCHS": 1,
-        "N_BATCHES": 5
+        "REGULARIZER": "elasticnet",
+        "REGULARIZATION_PENALTY": 0.0001,
+        "EPOCHS": 5,
+        "N_BATCHES": 25
     }
 }
