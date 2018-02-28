@@ -29,7 +29,14 @@ The `Examples` directory contains mini-implementations of different methods intr
 ## Approach
 First it was necessary to load and preprocess the data. All the data is normalized, split into n-folds for cross validaiton and testing. Each model has then been carefuly selected based on the hyperaparameter optimization. The details of which hyperaparameters, with respect to the model, have been considered can be found in `src/Models`.
 
-## Winning models
+## Evaluation
+Overall this exploration showed that logistic regression achieved worse test accuracy in solving this problem than linear regression classifier presented originally by 3.6%. However a denser neural network, with more neurons than the original implementation, improved on the test accuracy by 3.7%.
+
+Confusion Matrix for Linear Method  |  Confusion Matrix for Neural Network
+:-------------------------:|:-------------------------:
+![](Figures/CM_LR.png)  |  ![](Figures/CM_NN.png)
+
+Further exploration of this problem could be done in the realm of transforming the features into higher dimension that could better aid the separation of quality or pre-selecting features based on statistical ranking.
 
 ## Building & Running
 To train and generate all the figures for the winning models just run inside the src directory:

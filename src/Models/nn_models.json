@@ -1,14 +1,14 @@
 {
     "0" : {
-        "LEARNING_RATE": 0.01,
-        "HIDDEN_LAYERS": 7,
-        "HIDDEN_NEURONS": 100,
+        "LEARNING_RATE": 0.001,
+        "HIDDEN_LAYERS": 1,
+        "HIDDEN_NEURONS": 80,
         "REGULARIZER": "L2",
-        "REGULARIZATION_PENALTY": 0.01,
+        "REGULARIZATION_PENALTY": 0.00001,
         "ACTIVATION": "relu",
-        "EPOCHS": 2,
-        "N_BATCHES": 10,
-        "DROPOUT": 0.8,
+        "EPOCHS": 5,
+        "N_BATCHES": 25,
+        "DROPOUT": 0.7,
         "BETA1": 0.99
     }
 }

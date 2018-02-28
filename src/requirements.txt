@@ -5,3 +5,5 @@ tflearn
 scikit-learn
 scipy
 seaborn
+pandas
+matplotlib
