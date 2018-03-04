@@ -5,7 +5,7 @@ import numpy as np
 
 from .visualize import visualize
 from .linear import LinearRegressionClassifier
-from postprocess import plot_confusion_matrix, calculate_scores
+from postprocess import plot_confusion_matrix, calculate_scores, calculate_MAD
 
 # Separete the labels from the features
 def separete_data(data):
@@ -29,6 +29,8 @@ def n_fold(model, n_folds = 10, save = True, test = False):
     accuracies_train = []
     accuracies = []
     losses = []
+    Y_pred = []
+    Y_actual = []
 
     print("### Beginning n-fold cross validation with parameters: ###")
     print("## Classifier name: {}##".format(BASE_NAME))
@@ -65,6 +67,8 @@ def n_fold(model, n_folds = 10, save = True, test = False):
         else:
             X_val, Y_val = separete_data(validation_data)
 
+        Y_actual.append(Y_val)
+
         # Initialize a new classifier per each new fold, all the classifiers are going to have the same parameters
         CLF_NAME = BASE_NAME + "_"+  str(i)
         clf = LinearRegressionClassifier(name = CLF_NAME, base_name = BASE_NAME)
@@ -81,22 +85,23 @@ def n_fold(model, n_folds = 10, save = True, test = False):
         # Get the validation accracy for one fold
         accuracy = clf.evaluate_model(X_val,Y_val)
         y_pred = clf.predict(X_val)
+        Y_pred.append(y_pred)
 
-        # Plot confusion matrix
-        plot_confusion_matrix(Y_val, y_pred, BASE_NAME,model="Linear_Classifier", normalize=True, fold=i)
-        # and not normalized as well
-        plot_confusion_matrix(Y_val, y_pred, BASE_NAME,model="Linear_Classifier", normalize=False, fold=i)
+        if not test:
+            # Plot confusion matrix
+            plot_confusion_matrix(Y_val, y_pred, BASE_NAME,model="Linear_Classifier", normalize=True, fold=i)
+            # and not normalized as well
+            plot_confusion_matrix(Y_val, y_pred, BASE_NAME,model="Linear_Classifier", normalize=False, fold=i)
 
         # Calculate also Recall and precision
         calculate_scores(Y_val, y_pred, BASE_NAME, model="Linear_Classifier", fold=i)
 
         print("## Validation Accuracy:{} ##".format(accuracy))
+
         accuracies.append(accuracy)
 
         # Delete the previous classifier to avoid retraining
         del clf
-        if test:
-            break
 
 
     # Visualize all folds in one plot
@@ -105,6 +110,14 @@ def n_fold(model, n_folds = 10, save = True, test = False):
         print("### Finished n-fold cross validation ###")
     else:
         print("### Finished final test ###")
+        Y_actual = np.array(Y_actual).flatten()
+        Y_pred = np.array(Y_pred).flatten()
+        # Plot confusion matrix
+        plot_confusion_matrix(Y_actual, Y_pred, BASE_NAME,model="Linear_Classifier", normalize=True, fold=10)
+        # and not normalized as well
+        plot_confusion_matrix(Y_actual, Y_pred, BASE_NAME,model="Linear_Classifier", normalize=False, fold=10)
+        mad = calculate_MAD(Y_actual, Y_pred)
+        print("## MAD:{} ##".format(mad))
 
     # Calculate the average accuracy
     final_accuracy = np.mean(np.array(accuracies))

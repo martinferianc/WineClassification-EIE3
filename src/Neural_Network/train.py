@@ -5,7 +5,7 @@ import numpy as np
 
 from .network import Network
 import tensorflow as tf
-from .postprocess import plot_confusion_matrix, calculate_scores
+from .postprocess import plot_confusion_matrix, calculate_scores, calculate_MAD
 
 # Convert labels into one-hot representation
 def one_hot(labels):
@@ -25,6 +25,8 @@ def separete_data(data):
 # This function performs training for the specific network and performs n_fold cross validation
 def n_fold(model, n_folds = 10, save = True, test = False):
     accuracies = []
+    Y_pred = []
+    Y_actual = []
 
     LEARNING_RATE = float(model["LEARNING_RATE"])
     HIDDEN_LAYERS =int(model["HIDDEN_LAYERS"])
@@ -77,6 +79,7 @@ def n_fold(model, n_folds = 10, save = True, test = False):
             else:
                 X_val, Y_val, y_test = separete_data(validation_data)
 
+            Y_actual.append(list(y_test))
             # Initialize a new network per each new fold, all the networks are going to be the same
             NET_NAME = BASE_NAME + "_"+  str(i)
             net = Network(name = NET_NAME, base_name = BASE_NAME)
@@ -87,10 +90,13 @@ def n_fold(model, n_folds = 10, save = True, test = False):
             net.train(X_train,Y_train,X_val,Y_val, epochs=EPOCHS, batch_size = N_BATCHES, save=save, file_path="models")
             y_pred = net.predict(X_val)
 
-            # Plot confusion matrix
-            plot_confusion_matrix(y_test, y_pred, BASE_NAME,model="Neural_Network", normalize=True, fold=i)
-            # and not normalized as well
-            plot_confusion_matrix(y_test, y_pred, BASE_NAME,model="Neural_Network", normalize=False, fold=i)
+            Y_pred.append(list(y_pred))
+
+            if not test:
+                # Plot confusion matrix
+                plot_confusion_matrix(y_test, y_pred, BASE_NAME,model="Neural_Network", normalize=True, fold=i)
+                # and not normalized as well
+                plot_confusion_matrix(y_test, y_pred, BASE_NAME,model="Neural_Network", normalize=False, fold=i)
 
             # Calculate precision, and recall store that as well
             calculate_scores(y_test, y_pred, BASE_NAME,model="Neural_Network", fold=i)
@@ -100,13 +106,19 @@ def n_fold(model, n_folds = 10, save = True, test = False):
             print("## Validation Accuracy:{} ##".format(accuracy[0]))
             accuracies.append(accuracy)
 
-        if not test:
-            print("### Finished n-fold cross validation ###")
-        else:
-            print("### Finished final test ###")
+    if not test:
+        print("### Finished n-fold cross validation ###")
+    else:
+        print("### Finished final test ###")
+        Y_actual = np.array(Y_actual).flatten()
+        Y_pred = np.array(Y_pred).flatten()
+        # Plot confusion matrix
+        plot_confusion_matrix(Y_actual, Y_pred, BASE_NAME,model="Neural_Network", normalize=True, fold=10)
+        # and not normalized as well
+        plot_confusion_matrix(Y_actual, Y_pred, BASE_NAME,model="Neural_Network", normalize=False, fold=10)
+        mad = calculate_MAD(Y_actual, Y_pred)
+        print("## MAD:{} ##".format(mad))
 
-        if test:
-            break
 
     final_accuracy = np.mean(np.array(accuracies))
     print("##### Average Accuracy:{} ######".format(final_accuracy))

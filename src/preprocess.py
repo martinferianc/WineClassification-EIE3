@@ -68,7 +68,7 @@ def load_data_set(data_quality, fold=0, d_set="training", base_dir=BASE_DIR + "p
     print("Loading file: {0}".format(file_path))
     return np.load(file_path)
 
-def normalize(data):
+def normalize(data, zero_to_one=False):
     # Transpose the data so that we can operate on columns as rows
     data = np.transpose(data)
 
@@ -76,6 +76,14 @@ def normalize(data):
     # Do not normalize the labels!
     for i in tqdm(range(len(data)-1)):
         data[i] = (data[i] - np.mean(data[i]))/np.std(data[i])
+    if zero_to_one:
+        for i in tqdm(range(len(data)-1)):
+            mi = np.amin(data[i])
+            data[i] -= mi
+        for i in tqdm(range(len(data)-1)):
+            mx = np.amax(data[i])
+            data[i] /= mx
+
     # Transpose the data back
     data = np.transpose(data)
 

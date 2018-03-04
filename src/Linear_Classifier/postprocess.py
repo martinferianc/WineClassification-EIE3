@@ -2,6 +2,14 @@ import itertools
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, precision_score, recall_score
+import os
+
+
+def calculate_MAD(y_test, y_pred):
+    s = 0
+    for i in range(len(y_test)):
+        s+=abs(y_test[i]-y_pred[i])
+    return s/len(y_test)
 
 # This function calculates the recall, precision scores and saves it into a file
 def calculate_scores(y_test, y_pred, name,model, fold = None,):
@@ -70,6 +78,9 @@ def plot_confusion_matrix(y_test, y_pred, name, model,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+
+    if not os.path.isdir("{}/{}/{}/{}_{}".format(model,"logs",name, name,fold)):
+        os.makedirs("{}/{}/{}/{}_{}".format(model,"logs",name, name,fold))
 
     if normalize:
         plt.savefig("{}/{}/{}/{}_{}/cm_n_{}.png".format(model,"logs",name, name,fold, name))

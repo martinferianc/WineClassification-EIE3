@@ -1,2 +1,4 @@
-models/*
 logs/*
+!logs/placeholder.txt
+models/*
+!models/placeholder.txt

@@ -12,7 +12,7 @@ NN_MODELS = "nn_models.json"
 # Specify the name of the test
 TEST = "N_Neurons"
 if __name__ == '__main__':
-    
+
     # Load the models to be trained and tested
     lin_models = json.load(open(MODEL_DIR + LIN_MODELS))
     nn_models = json.load(open(MODEL_DIR + NN_MODELS))

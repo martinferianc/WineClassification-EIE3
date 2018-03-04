@@ -1,8 +1,10 @@
 from tflearn.layers.core import input_data, dropout, fully_connected
 from tflearn.layers.estimator import regression
 from tflearn.optimizers import Adam
+from tflearn.layers.normalization import batch_normalization
 from tflearn import DNN
 from tflearn import activations
+import tensorflow as tf
 import os
 
 import numpy as np
@@ -21,16 +23,8 @@ class Network:
     def init_self_net(self ,hidden_layers, hidden_neurons,drop=0.8,beta1=0.99,lr=0.001, activation="relu", n_features=11, n_classes=11, regularizer="", regularization_penalty=0.001):
         self.net = input_data(shape=[None, n_features], name='input')
         for i in range(hidden_layers):
-            self.net = fully_connected(self.net, hidden_neurons, regularizer=regularizer, weight_decay=regularization_penalty)
-
-            if activation == "elu":
-                self.net = activations.elu(self.net)
-            elif activation == "relu":
-                self.net = activations.relu(self.net)
-            elif activation == "tanh":
-                self.net = activations.tanh(self.net)
-            elif activation == "selu":
-                self.net = activations.selu(self.net)
+            self.net = fully_connected(self.net, hidden_neurons, regularizer=regularizer, activation=activation, weight_decay=regularization_penalty)
+            self.net = batch_normalization(self.net)
             self.net = dropout(self.net, drop)
 
         self.net = fully_connected(self.net, n_classes, activation='softmax')
