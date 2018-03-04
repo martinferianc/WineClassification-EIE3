@@ -32,11 +32,8 @@ First it was necessary to load and preprocess the data. All the data is normaliz
 
 Correlation matrix |  Score Histogram
 :-------------------------:|:-------------------------:
-![](Figures/CM_NN.png)  |  ![](Figures/Class_Histogram.png)
+![](Figures/CM_Correlation_matrix.png)  |  ![](Figures/Class_Histogram.png)
 
-Confusion Matrix for Linear Method  |  Confusion Matrix for Neural Network
-:-------------------------:|:-------------------------:
-![](Figures/CM_LR.png)  |  ![](Figures/CM_NN.png)
 
 Each model has then been carefuly selected based on the hyperaparameter optimization. The details of which hyperaparameters, with respect to the model, have been considered can be found in `src/Models`.
 
