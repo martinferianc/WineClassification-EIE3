@@ -32,7 +32,7 @@ First it was necessary to load and preprocess the data. All the data is normaliz
 
 Correlation matrix |  Score Histogram
 :-------------------------:|:-------------------------:
-![](Figures/CM_Correlation_matrix.png)  |  ![](Figures/Class_Histogram.png)
+![](Figures/Correlation_matrix.png)  |  ![](Figures/Class_Histogram.png)
 
 
 Each model has then been carefuly selected based on the hyperaparameter optimization. The details of which hyperaparameters, with respect to the model, have been considered can be found in `src/Models`.
