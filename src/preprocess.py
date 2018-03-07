@@ -127,7 +127,12 @@ def build_data_sets(types = ["red", "white"]):
 
     print("Loading files")
     data_red = load_data(file_path_red)
+    #Denote red wine
+    data_red = np.insert(data_red, 0, values=0, axis=1)
+
     data_white = load_data(file_path_white)
+    #Denote white wine
+    data_white = np.insert(data_white, 0, values=1, axis=1)
 
     # Join the red and white wines togeter
     data = np.concatenate((data_red,data_white), axis = 0)

@@ -14,7 +14,7 @@ def separete_data(data):
     return (features, labels)
 
 # This function performs training for the specific network and performs n_fold cross validation
-def n_fold(model, n_folds = 10, save = True, test = False):
+def n_fold(model, n_folds = 1, save = True, test = False):
     LEARNING_RATE = float(model["LEARNING_RATE"])
     LOSS = model["LOSS"]
     STOP = float(model["STOP"])

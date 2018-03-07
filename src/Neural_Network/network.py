@@ -20,7 +20,7 @@ class Network:
         self.net = None
 
     #Initializes the network
-    def init_self_net(self ,hidden_layers, hidden_neurons,drop=0.8,beta1=0.99,lr=0.001, activation="relu", n_features=11, n_classes=11, regularizer="", regularization_penalty=0.001):
+    def init_self_net(self ,hidden_layers, hidden_neurons,drop=0.8,beta1=0.99,lr=0.001, activation="relu", n_features=12, n_classes=11, regularizer="", regularization_penalty=0.001):
         self.net = input_data(shape=[None, n_features], name='input')
         for i in range(hidden_layers):
             self.net = fully_connected(self.net, hidden_neurons, regularizer=regularizer, activation=activation, weight_decay=regularization_penalty)

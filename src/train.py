@@ -10,7 +10,7 @@ LIN_MODELS = "lin_models.json"
 NN_MODELS = "nn_models.json"
 
 # Specify the name of the test
-TEST = "N_Neurons"
+TEST = "Learning_Rate"
 if __name__ == '__main__':
 
     # Load the models to be trained and tested
@@ -34,9 +34,9 @@ if __name__ == '__main__':
         losses.append(loss)
         final_accuracies.append(final_accuracy)
 
-    visualize(accuracies_train, accuracies_val, losses, "Elastic_Net", ["Penalty = 0.1", "Penalty = 0.01", "Penalty = 0.001","Penalty = 0.0001"])
+    visualize(accuracies_train, accuracies_val, losses, "Learning_Rate", ["LR = 0.1", "LR = 0.01", "LR = 0.001","LR = 0.0001"])
 
     indices = [int(model) for model in nn_models]
     indices.sort()
-    for model in indices:
-        train_net_model(nn_models[str(model)], test=True)
+    #for model in indices:
+    #    train_net_model(nn_models[str(model)], test=True)
