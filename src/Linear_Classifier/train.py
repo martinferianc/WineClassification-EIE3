@@ -14,7 +14,7 @@ def separete_data(data):
     return (features, labels)
 
 # This function performs training for the specific network and performs n_fold cross validation
-def n_fold(model, n_folds = 1, save = True, test = False):
+def n_fold(model, n_folds = 10, save = True, test = False):
     LEARNING_RATE = float(model["LEARNING_RATE"])
     LOSS = model["LOSS"]
     STOP = float(model["STOP"])
@@ -116,6 +116,7 @@ def n_fold(model, n_folds = 1, save = True, test = False):
         plot_confusion_matrix(Y_actual, Y_pred, BASE_NAME,model="Linear_Classifier", normalize=True, fold=10)
         # and not normalized as well
         plot_confusion_matrix(Y_actual, Y_pred, BASE_NAME,model="Linear_Classifier", normalize=False, fold=10)
+        calculate_scores(Y_val, y_pred, BASE_NAME, model="Linear_Classifier", fold=10)
         mad = calculate_MAD(Y_actual, Y_pred)
         print("## MAD:{} ##".format(mad))
 

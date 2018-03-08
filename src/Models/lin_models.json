@@ -1,33 +1,6 @@
 {
     "0" : {
-        "LEARNING_RATE": 0.1,
-        "LOSS": "log",
-        "STOP": 0.0000001,
-        "REGULARIZER": "elasticnet",
-        "REGULARIZATION_PENALTY": 0.0001,
-        "EPOCHS": 5,
-        "N_BATCHES": 25
-    },
-    "1" : {
-        "LEARNING_RATE": 0.01,
-        "LOSS": "log",
-        "STOP": 0.0000001,
-        "REGULARIZER": "elasticnet",
-        "REGULARIZATION_PENALTY": 0.0001,
-        "EPOCHS": 5,
-        "N_BATCHES": 25
-    },
-    "2" : {
         "LEARNING_RATE": 0.001,
-        "LOSS": "log",
-        "STOP": 0.0000001,
-        "REGULARIZER": "elasticnet",
-        "REGULARIZATION_PENALTY": 0.0001,
-        "EPOCHS": 5,
-        "N_BATCHES": 25
-    },
-    "3" : {
-        "LEARNING_RATE": 0.0001,
         "LOSS": "log",
         "STOP": 0.0000001,
         "REGULARIZER": "elasticnet",

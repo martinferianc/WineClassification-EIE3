@@ -1,7 +1,7 @@
 import itertools
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix, precision_score, recall_score
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score
 import os
 
 
@@ -12,7 +12,7 @@ def calculate_MAD(y_test, y_pred):
     return s/len(y_test)
 
 # This function calculates the recall, precision scores and saves it into a file
-def calculate_scores(y_test, y_pred, name,model, fold = None,):
+def calculate_scores(y_test, y_pred, name,model, fold = None):
     with open("{}/{}/{}/{}_{}/scores_{}.txt".format(model,"logs",name, name,fold, name), "w") as text_file:
         # It might happen that a quality can be not represented at all in a test, training, val set
         # Hence check for that case because the classifier might not have seen that quality at all
@@ -32,6 +32,10 @@ def calculate_scores(y_test, y_pred, name,model, fold = None,):
         r_score =  recall_score(y_test, y_pred, average=None)
         text_file.write("Labels:\n{}\n".format(classes))
         text_file.write("Recall scores:\n{}".format(r_score))
+
+        f1 =  f1_score(y_test, y_pred, average=None)
+        text_file.write("Labels:\n{}\n".format(classes))
+        text_file.write("F1 scores:\n{}".format(f1))
 
 # This function calculates the confusion matrix and visualizes it
 def plot_confusion_matrix(y_test, y_pred, name, model,

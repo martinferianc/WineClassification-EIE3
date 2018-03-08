@@ -116,6 +116,7 @@ def n_fold(model, n_folds = 10, save = True, test = False):
         plot_confusion_matrix(Y_actual, Y_pred, BASE_NAME,model="Neural_Network", normalize=True, fold=10)
         # and not normalized as well
         plot_confusion_matrix(Y_actual, Y_pred, BASE_NAME,model="Neural_Network", normalize=False, fold=10)
+        calculate_scores(Y_actual, Y_pred, BASE_NAME, model="Neural_Network", fold=10)
         mad = calculate_MAD(Y_actual, Y_pred)
         print("## MAD:{} ##".format(mad))
 
