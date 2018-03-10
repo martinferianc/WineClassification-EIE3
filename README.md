@@ -1,4 +1,4 @@
-# Fine wine classification
+# Classifying Wines based on Physicochemical Properties
 This work looks at a famous classification problem targeting classification of Portuguese wines first presented by (see [Cortez et al., 2009](http://www3.dsi.uminho.pt/pcortez/wine/)). Red wines 1599 and 4898 white wines were classified into 7 (wine score ranging from 3 to 9) classes based on their quality and their 11 physicochemical features, in total giving 6497 wines-samples. This work presents an investigation of logistic regression classifier} and a neural network in pursuit of finding the highest accuracy, while classifying the wines.
 
 This project was a part of coursework for module EE3-23 Machine Learning at Imperial College London, [Link](http://intranet.ee.ic.ac.uk/electricalengineering/eecourses_t4/course_content.asp?c=EE3-23&s=E3#start).
@@ -45,7 +45,6 @@ Confusion Matrix for Linear Method  |  Confusion Matrix for Neural Network
 :-------------------------:|:-------------------------:
 ![](Figures/CM_LR.png)  |  ![](Figures/CM_NN.png)
 
-Further exploration of this problem could be done in the realm of transforming the features into higher dimension that could better aid the separation of quality or pre-selecting features based on statistical ranking.
 
 ## Building & Running
 To train and generate all the figures for the winning models just run inside the `src` directory:
