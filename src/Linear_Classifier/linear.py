@@ -35,7 +35,7 @@ class LinearRegressionClassifier:
         sys.stdout = mystdout = io.StringIO()
         # Initialize the classifier
         self.clf = linear_model.SGDClassifier(alpha=regularizer_penalty, average=False, class_weight=None, epsilon=0.1,
-                                              n_jobs = 1,learning_rate="constant", eta0=learning_rate, loss=loss, max_iter=5, fit_intercept=False,
+                                              n_jobs = 1,learning_rate="optimal", eta0=learning_rate, loss=loss, max_iter=5, fit_intercept=False,
                                               penalty=regularizer, tol=stop, verbose=1, warm_start=True)
 
         # Train for the maximum number of epochs and iteration

@@ -34,7 +34,7 @@ def analyze_data(data):
     print("{}, {}".format(l,c))
 
 
-    plt.hist(labels, bins = l)
+    plt.hist(labels, bins = l, align='right')
     plt.title("Class histogram")
     plt.xlabel("Class")
     plt.ylabel("Count")
