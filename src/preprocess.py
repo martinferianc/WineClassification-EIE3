@@ -20,11 +20,20 @@ def load_data(file_path):
 def analyze_data(data):
     data = copy.deepcopy(data)
     features = np.array(copy.deepcopy([x[:-1] for x in data]), dtype=np.float64)
+    labels = np.array(copy.deepcopy([x[-1] for x in data]), dtype=np.int32)
 
     d = pd.DataFrame(data=features)
     metrics = d.describe().loc[['mean','std','min','max']]
-    metrics = metrics.transpose()
+    metrics = metrics.round(2).transpose()
     print(metrics.to_latex())
+
+    white = []
+    red = []
+    for i in range(len(features)):
+        if features[i][0] == 0:
+            red.append(copy.deepcopy(labels[i]))
+        else:
+            white.append(copy.deepcopy(labels[i]))
 
     data = normalize(data)
     features = np.array(copy.deepcopy([x[:-1] for x in data]), dtype=np.float64)
@@ -34,10 +43,12 @@ def analyze_data(data):
     print("{}, {}".format(l,c))
 
 
-    plt.hist(labels, bins = l, align='right')
+    plt.hist(red, bins = l, alpha=0.5, align='right', color="red", label="Red Wine")
+    plt.hist(white, bins = l,  alpha=0.5, align='right', color = "skyblue", label = "White Wine")
     plt.title("Class histogram")
     plt.xlabel("Class")
     plt.ylabel("Count")
+    plt.legend()
     plt.grid(True)
     plt.savefig("../Figures/{}".format("Class_Histogram.png"))
     plt.close()
@@ -50,13 +61,14 @@ def analyze_data(data):
     corr = d.corr()
 
     fig, ax = plt.subplots(figsize=(11, 11))
-    ax.matshow(corr)
-    plt.xticks(range(len(corr.columns)), corr.columns, fontsize=13);
-    plt.yticks(range(len(corr.columns)), corr.columns, fontsize=13);
+    cax = plt.matshow(corr, interpolation="nearest")
+    plt.xticks(range(len(corr.columns)), corr.columns, fontsize=8)
+    plt.yticks(range(len(corr.columns)), corr.columns, fontsize=8)
+    plt.colorbar(cax)
 
-    plt.title("Features",fontsize=20)
-    plt.xlabel("Correlation matrix", fontsize=30)
-    plt.ylabel("Features",fontsize=20)
+    plt.title("Features",fontsize=12)
+    plt.xlabel("Correlation matrix", fontsize=20)
+    plt.ylabel("Features",fontsize=12)
     plt.savefig("../Figures/{}".format("Correlation_matrix.png"))
 
     plt.close()
