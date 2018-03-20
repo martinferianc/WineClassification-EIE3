@@ -27,18 +27,20 @@ The `Examples` directory contains mini-implementations of different methods intr
 All the ourcomes are summarized in the [report](Report.pdf).
 
 ## Approach
+
 The work presented by Cortez considered two separate methods, linear regression for classification and a shallow neural network with one hidden layer, in addition to SVMs. They have separated the data between red and white wines and the resultant accuracies with respect to the methods were: 31.2% and 31.1% for red wine and 25.6% and 26.5% for white wine.
 
-First it was necessary to load and preprocess the data. All the data is normalized, split into n-folds for cross validaiton and testing. Below are the histogram for the score representations in the data and the correlation matrix for the given 11 features.
+First it was necessary to load and preprocess the data. All the data is normalized, split into 10 folds for cross validaiton and testing. Below are the histogram for the score representations in the data and the correlation matrix for the given 11 features plus the wine type.
 
 Correlation matrix |  Score Histogram
 :-------------------------:|:-------------------------:
 ![](Figures/Correlation_matrix.png)  |  ![](Figures/Class_Histogram.png)
 
 
-Each model has then been carefuly selected based on the hyperaparameter optimization. The details of which hyperaparameters, with respect to the model, have been considered can be found in `src/Models`.
+Each model has then been carefuly selected based on the hyperaparameter optimization. The details of which hyperaparameters, with respect to the model, have been considered can be found in json files inside `src/Models`.
 
 ## Evaluation
+
 Overall this exploration showed that logistic regression achieved better test accuracy in solving this problem than linear regression classifier presented originally by 13.3%. Furthermore a denser neural network, with more neurons than the original implementation, improved on the test accuracy in average by 24.7%.
 
 Confusion Matrix for Linear Method  |  Confusion Matrix for Neural Network
@@ -55,6 +57,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 python3 main.py
 ```
+
 and the figures will be found in `<Method>/logs/`
 
 ## Credits
