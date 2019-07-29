@@ -28,7 +28,7 @@ All the ourcomes are summarized in the [report](Report.pdf).
 
 ## Approach
 
-The work presented by Cortez considered two separate methods, linear regression for classification and a shallow neural network with one hidden layer, in addition to SVMs. They have separated the data between red and white wines and the resultant accuracies with respect to the methods were: 31.2% and 31.1% for red wine and 25.6% and 26.5% for white wine.
+The work presented by Cortez et al. considered two separate methods, linear regression for classification and a shallow neural network with one hidden layer, in addition to SVMs. They have separated the data between red and white wines and the resultant accuracies with respect to the methods were: 31.2% and 31.1% for red wine and 25.6% and 26.5% for white wine.
 
 First it was necessary to load and preprocess the data. All the data is normalized, split into 10 folds for cross validaiton and testing. Below are the histogram for the score representations in the data and the correlation matrix for the given 11 features plus the wine type.
 
