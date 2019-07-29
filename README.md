@@ -24,7 +24,7 @@ This project was a part of coursework for module EE3-23 Machine Learning at Impe
 ```
 The `Examples` directory contains mini-implementations of different methods introduced in the course. `src` Contains all the sourcecode to generate the best models for both considered models. The models are located in 2 separete directories, `Linear_Classifier` and `Neural_Network`. The final model parameters can be found under `src/Models`.
 
-All the ourcomes are summarized in the [report](Report.pdf).
+All the outcomes are summarized in the [report](Report.pdf).
 
 ## Approach
 
